@@ -3,35 +3,49 @@
 # Update the package repository
 apk update
 
-# Install zsh, curl, git, oh-my-zsh, nano, sudo, openssh-keygen, openssh-client
-apk add zsh curl git nano sudo openssh-keygen openssh-client
+# Install essential tools
+apk add zsh curl git nano sudo openssh-keygen openssh-client figlet
 
-# Copy .zshrc to home directory
+# Clone Oh My Zsh repository
+git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+
+# Copy configuration files
 cp .zshrc ~/.zshrc
+cp -r .ssh/ ~/.ssh
 
-# Install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-# Install antigen
+# Install Antigen
 curl -L git.io/antigen > ~/.antigen.sh
 
 # Create an empty .dirs file
 touch ~/.dirs
 
-# Add .dirs content to PATH in ~/.zshrc
-echo "export PATH=\$PATH:$(cat ~/.dirs)" >> ~/.zshrc
+# Configure PATH in ~/.zshrc
+echo "export PATH=\$PATH:'\$(cat ~/.dirs)'" >> ~/.zshrc
 
-# Add antigen config to ~/.zshrc
-echo "source ~/.antigen.sh" >> ~/.zshrc
+# Configure Antigen in ~/.zshrc
+cat <<EOF >> ~/.zshrc
 
-# Add antigen bundles to ~/.zshrc
-echo "antigen use oh-my-zsh" >> ~/.zshrc
-echo "antigen bundle git" >> ~/.zshrc
-echo "antigen bundle zsh-users/zsh-syntax-highlighting" >> ~/.zshrc
-echo "antigen bundle zsh-users/zsh-autosuggestions" >> ~/.zshrc
-echo "antigen bundle zsh-users/zsh-completions" >> ~/.zshrc
+# Antigen Configuration
+source ~/.antigen.sh
 
-# Copy .ssh directory to home directory
-cp -r .ssh/ ~/.ssh
+# Load the oh-my-zsh's library.
+antigen use oh-my-zsh
 
-echo "Setup complete!!!"
+# Antigen Bundles
+antigen bundle git
+
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-completions
+
+# Apply Antigen configuration
+antigen apply
+EOF
+
+echo "Setup completed!!!"
+
+# Change the default shell to Zsh
+sed -i 's:/bin/ash:/bin/zsh:' /etc/passwd
+
+# Print "Brokenc0de Setup" using figlet
+figlet "Brokenc0de Setup"
