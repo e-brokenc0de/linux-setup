@@ -10,7 +10,6 @@ apk add zsh curl git nano sudo openssh-keygen openssh-client figlet
 git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
 
 # Copy configuration files
-cp .zshrc ~/.zshrc
 cp -r .ssh/ ~/.ssh
 
 # Install Antigen
@@ -23,7 +22,14 @@ touch ~/.dirs
 echo "export PATH=\$PATH:'\$(cat ~/.dirs)'" >> ~/.zshrc
 
 # Configure Antigen in ~/.zshrc
-cat <<EOF >> ~/.zshrc
+cat <<EOF > ~/.zshrc
+# .zshrc created by brokekc0de
+
+# ZSH env
+export ZSH="$HOME/.oh-my-zsh"
+
+# the zsh file
+source $ZSH/oh-my-zsh.sh
 
 # Antigen Configuration
 source ~/.antigen.sh
