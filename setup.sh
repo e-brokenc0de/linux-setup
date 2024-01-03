@@ -1,7 +1,15 @@
 #!/bin/sh
 
-# Install zsh, curl, git, and oh-my-zsh
-apk add zsh curl git
+# Update the package repository
+apk update
+
+# Install zsh, curl, git, oh-my-zsh, nano, sudo, openssh-keygen, openssh-client
+apk add zsh curl git nano sudo openssh-keygen openssh-client
+
+# Copy .zshrc to home directory
+cp .zshrc ~/.zshrc
+
+# Install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Install antigen
@@ -23,4 +31,7 @@ echo "antigen bundle zsh-users/zsh-syntax-highlighting" >> ~/.zshrc
 echo "antigen bundle zsh-users/zsh-autosuggestions" >> ~/.zshrc
 echo "antigen bundle zsh-users/zsh-completions" >> ~/.zshrc
 
-echo "Zsh setup with an empty .dirs file complete!"
+# Copy .ssh directory to home directory
+cp -r .ssh/ ~/.ssh
+
+echo "Setup complete!!!"
