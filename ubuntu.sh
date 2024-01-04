@@ -4,7 +4,7 @@
 sudo apt update
 
 # Install essential tools
-sudo apt install zsh curl git nano sudo openssh-client figlet
+sudo apt -y install zsh curl git nano sudo openssh-client figlet
 
 # Clone Oh My Zsh repository
 git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
@@ -55,3 +55,5 @@ chsh -s $(which zsh)
 
 # Print "Setup Complete" using figlet
 figlet "Setup Complete"
+
+zsh
