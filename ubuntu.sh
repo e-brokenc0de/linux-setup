@@ -1,54 +1,54 @@
 #!/bin/bash
 
-# Update the package repository
-sudo apt update
+set -e  # Exit immediately if a command exits with a non-zero status
 
-# Install essential tools
-sudo apt -y install zsh curl git nano sudo openssh-client figlet
+# Update the package repository and install essential tools
+sudo apt update && sudo apt -y install zsh curl git nano sudo openssh-client figlet software-properties-common
 
-# Clone Oh My Zsh repository
-git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+# Clone Oh My Zsh repository if it doesn't exist
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+fi
 
-# Optionally, copy existing SSH keys
-# cp -r .ssh/ ~/.ssh
+# Optionally, copy existing SSH keys if .ssh directory exists
+# [ -d ".ssh" ] && cp -r .ssh/ ~/
 
-# Install Antigen
-curl -L git.io/antigen > ~/.antigen.sh
+# Install Antigen if not already installed
+if [ ! -f "$HOME/.antigen.sh" ]; then
+    curl -L git.io/antigen > ~/.antigen.sh
+fi
 
-# Create an empty .dirs file
+# Create an empty .dirs file if it doesn't exist
 touch ~/.dirs
 
-# Configure PATH in ~/.zshrc
-echo "export PATH=\$PATH:'\$(cat ~/.dirs)'" >> ~/.zshrc
+# Configure PATH and Antigen in ~/.zshrc
+if ! grep -q "antigen.sh" ~/.zshrc; then
+    cat <<EOF >> ~/.zshrc
 
-# Configure Antigen in ~/.zshrc
-cat <<EOF > ~/.zshrc
-# .zshrc created for Ubuntu
-
-# ZSH env
+# ZSH Configuration
+export PATH=\$PATH:\$(cat ~/.dirs)
 export ZSH="\$HOME/.oh-my-zsh"
-
-# Source the zsh file
 source \$ZSH/oh-my-zsh.sh
-
-# Antigen Configuration
 source ~/.antigen.sh
 
-# Load the oh-my-zsh's library.
-antigen use oh-my-zsh
-
 # Antigen Bundles
+antigen use oh-my-zsh
 antigen bundle git
-
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-completions
-
 antigen theme robbyrussell
-
-# Apply Antigen configuration
 antigen apply
 EOF
+fi
+
+# Add PHP repository and install PHP 8.2 with common extensions
+sudo add-apt-repository -y ppa:ondrej/php
+sudo apt update
+sudo apt -y install php8.2 php8.2-cli php8.2-fpm php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath php8.2-json php8.2-intl
+
+# Install the latest version of Bun
+curl -fsSL https://bun.sh/install | bash
 
 echo "Setup completed!!!"
 
@@ -58,4 +58,5 @@ chsh -s $(which zsh)
 # Print "Setup Complete" using figlet
 figlet "Setup Complete"
 
-zsh
+# Start Zsh shell
+exec zsh
