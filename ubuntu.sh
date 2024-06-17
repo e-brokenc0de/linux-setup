@@ -7,9 +7,9 @@ command_exists() {
 
 # Install required packages
 install_requirements() {
-    echo "Installing required packages..."
-    sudo apt update
-    sudo apt install -y curl gnupg sudo lsb-release ca-certificates
+    gum style --foreground 212 "Installing required packages..."
+    sudo apt update -qq
+    sudo apt install -y -qq curl gnupg sudo lsb-release ca-certificates
 }
 
 # Ensure required packages are installed
@@ -19,12 +19,13 @@ install_requirements
 install_gum() {
     echo "Installing gum..."
     if ! command_exists gum; then
-        echo "gum could not be found, installing..."
+        gum style --foreground 212 "gum could not be found, installing..."
         sudo mkdir -p /etc/apt/keyrings
         curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
         echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
-        sudo apt update && sudo apt install gum
+        sudo apt update -qq && sudo apt install -y -qq gum
     fi
+    clear
 }
 
 # Install gum first to ensure it's available for further commands
@@ -43,12 +44,13 @@ install_php() {
     else
         if gum confirm "Do you want to install PHP?"; then
             gum style --foreground 212 "Adding PHP repository..."
-            sudo add-apt-repository ppa:ondrej/php -y
-            sudo apt update
+            sudo add-apt-repository ppa:ondrej/php -y -qq
+            sudo apt update -qq
 
             gum style --bold --border-foreground 212 --border double --padding "1 2" --margin "1" "Choose PHP packages to install:"
             php_packages=$(gum choose --no-limit php8.2 php8.2-cli php8.2-common php8.2-curl php8.2-mbstring php8.2-mysql php8.2-xml php8.2-zip)
-            sudo apt install -y $php_packages
+            gum style --foreground 212 "Installing selected PHP packages..."
+            sudo apt install -y -qq $php_packages
             install_composer
         fi
     fi
@@ -79,10 +81,15 @@ configure_zsh() {
     gum style --foreground 212 "Updating .zshrc with selected bundles and theme..."
     cat <<EOT >> ~/.zshrc
 
-# ZSH Configuration
+# create ~/.dirs if directory does not exist
+[ -f ~/.dirs ] || touch ~/.dirs
 export PATH=$PATH:$(cat ~/.dirs)
+
+# load oh-my-zsh
 export ZSH="$HOME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
+
+# load antigen
 source ~/.antigen.sh
 
 # Load the oh-my-zsh's library
@@ -118,8 +125,9 @@ install_docker() {
     else
         if gum confirm "Do you want to install Docker?"; then
             gum style --foreground 212 "Installing Docker..."
-            sudo apt-get update
-            sudo apt-get install \
+            sudo apt-get update -qq
+            gum style --foreground 212 "Installing Docker dependencies..."
+            sudo apt-get install -y -qq \
                 ca-certificates \
                 curl \
                 gnupg \
@@ -129,8 +137,9 @@ install_docker() {
             echo \
               "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
               $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo apt-get update
-            sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            sudo apt-get update -qq
+            gum style --foreground 212 "Installing Docker..."
+            sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             sudo usermod -aG docker $USER
             gum style --foreground 212 "Docker installed successfully."
         fi
